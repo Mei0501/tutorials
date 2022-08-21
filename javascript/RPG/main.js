@@ -2,7 +2,8 @@
 
 const CHRHEIGHT = 9;
 const CHRWIDTH = 8;
-const FONT = "48px monospace";
+const FONT = "12px monospace";
+const FONTSTYLE = "#ffffff";
 const HEIGHT = 120;
 const WIDTH = 128;
 const MAP_WIDTH = 32;
@@ -11,6 +12,7 @@ const SMOOTH = 0;
 const TILECOLUMN = 4;
 const TILEROW = 4;
 const TILESIZE = 8;
+const WNDSTYLE = "rgba(0,0,0, 0.75)";
 
 let gFrame = 0;
 let gHeight;
@@ -64,11 +66,14 @@ function DrawMain()
 {
   const g = gScreen.getContext("2d")
 
-  for ( let y = 0; y < 20 ; y++ ) {
-    for ( let x = 0; x < 20; x++ ) {
-      let px = gPlayerX + x;
-      let py = gPlayerY + y;
-      DrawTile( g, x * TILESIZE - TILESIZE /2, y * TILESIZE, gMap[ py * MAP_WIDTH + px ]);
+  for ( let dy = -7; dy <= 7; dy++ ) {
+    let  y = dy + 7;
+      let py = (gPlayerY + dy + MAP_HEIGHT ) % MAP_HEIGHT;
+    for ( let dx = -8; dx <= 8; dx++ ) {
+      let x =dx + 8;
+      let px = (gPlayerX + dx + MAP_WIDTH) % MAP_WIDTH;
+      DrawTile( g, x * TILESIZE - TILESIZE /2, y * TILESIZE,
+        gMap[ py * MAP_WIDTH + px ]);
     }
   }
   g.fillStyle = "#ff0000";
@@ -79,8 +84,12 @@ function DrawMain()
               CHRWIDTH, 0, CHRWIDTH, CHRHEIGHT,
               WIDTH / 2 - CHRWIDTH /2, HEIGHT / 2 - CHRHEIGHT + TILESIZE /2, CHRWIDTH, CHRHEIGHT);
 
-  // g.font = FONT;
-  // g.fillText("Hello World" + gFrame, gFrame / 10, 64);
+  g.fillStyle = WNDSTYLE;
+  g.fillRect(10, 103, 105, 15);
+
+  g.font = FONT;
+  g.fillStyle = FONTSTYLE;
+  g.fillText("x=" + gPlayerX +" y=" +gPlayerY,25, 115);
 }
 
 function DrawTile(g, x, y, idx)
