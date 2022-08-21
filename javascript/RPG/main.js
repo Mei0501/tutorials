@@ -68,13 +68,16 @@ function DrawMain()
     for ( let x = 0; x < 20; x++ ) {
       let px = gPlayerX + x;
       let py = gPlayerY + y;
-      DrawTile( g, x * TILESIZE, y * TILESIZE, gMap[ py * MAP_WIDTH + px ]);
+      DrawTile( g, x * TILESIZE - TILESIZE /2, y * TILESIZE, gMap[ py * MAP_WIDTH + px ]);
     }
   }
+  g.fillStyle = "#ff0000";
+  g.fillRect(0,HEIGHT / 2-1, WIDTH, 2);
+  g.fillRect(WIDTH /2 -1 ,0,2, HEIGHT);
 
   g.drawImage(gImgPlayer,
               CHRWIDTH, 0, CHRWIDTH, CHRHEIGHT,
-              WIDTH / 2, HEIGHT / 2, CHRWIDTH, CHRHEIGHT);
+              WIDTH / 2 - CHRWIDTH /2, HEIGHT / 2 - CHRHEIGHT + TILESIZE /2, CHRWIDTH, CHRHEIGHT);
 
   // g.font = FONT;
   // g.fillText("Hello World" + gFrame, gFrame / 10, 64);
