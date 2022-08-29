@@ -8,6 +8,8 @@ const HEIGHT = 120;
 const WIDTH = 128;
 const MAP_WIDTH = 32;
 const MAP_HEIGHT = 32;
+const SCR_HEIGHT = 8;
+const SCR_WIDTH = 8;
 const SMOOTH = 0;
 const TILECOLUMN = 4;
 const TILEROW = 4;
@@ -71,15 +73,15 @@ function DrawMain()
   let mx = Math.floor(gPlayerX / TILESIZE);
   let my = Math.floor(gPlayerY / TILESIZE);
 
-  for ( let dy = -7; dy <= 7; dy++ ) {
-    let  y = dy + 7;
+  for ( let dy = -SCR_HEIGHT; dy <= SCR_HEIGHT; dy++ ) {
     let ty = my + dy;
       let py = (ty + MAP_HEIGHT ) % MAP_HEIGHT;
-    for ( let dx = -8; dx <= 8; dx++ ) {
-      let x =dx + 8;
+    for ( let dx = -SCR_WIDTH; dx <= SCR_WIDTH; dx++ ) {
       let tx = mx + dx;
       let px = (tx + MAP_WIDTH) % MAP_WIDTH;
-      DrawTile( g, x * TILESIZE - TILESIZE /2, y * TILESIZE,
+      DrawTile( g,
+        tx * TILESIZE + WIDTH / 2 - gPlayerX,
+        ty * TILESIZE + HEIGHT / 2 - gPlayerY,
         gMap[ py * MAP_WIDTH + px ]);
     }
   }
