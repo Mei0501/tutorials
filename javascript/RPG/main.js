@@ -13,14 +13,16 @@ const TILECOLUMN = 4;
 const TILEROW = 4;
 const TILESIZE = 8;
 const WNDSTYLE = "rgba(0,0,0, 0.75)";
+const START_X =15;
+const START_Y = 17;
 
 let gFrame = 0;
 let gHeight;
 let gWidth;
 let gImgMap;
 let gImgPlayer;
-let gPlayerX = 0;
-let gPlayerY = 0;
+let gPlayerX = START_X * TILESIZE;
+let gPlayerY = START_Y * TILESIZE;
 let gScreen;
 
 const gFileMap = "img/map.png"
@@ -66,12 +68,17 @@ function DrawMain()
 {
   const g = gScreen.getContext("2d")
 
+  let mx = Math.floor(gPlayerX / TILESIZE);
+  let my = Math.floor(gPlayerY / TILESIZE);
+
   for ( let dy = -7; dy <= 7; dy++ ) {
     let  y = dy + 7;
-      let py = (gPlayerY + dy + MAP_HEIGHT ) % MAP_HEIGHT;
+    let ty = my + dy;
+      let py = (ty + MAP_HEIGHT ) % MAP_HEIGHT;
     for ( let dx = -8; dx <= 8; dx++ ) {
       let x =dx + 8;
-      let px = (gPlayerX + dx + MAP_WIDTH) % MAP_WIDTH;
+      let tx = mx + dx;
+      let px = (tx + MAP_WIDTH) % MAP_WIDTH;
       DrawTile( g, x * TILESIZE - TILESIZE /2, y * TILESIZE,
         gMap[ py * MAP_WIDTH + px ]);
     }
@@ -89,7 +96,7 @@ function DrawMain()
 
   g.font = FONT;
   g.fillStyle = FONTSTYLE;
-  g.fillText("x=" + gPlayerX +" y=" +gPlayerY,25, 115);
+  g.fillText("x=" + gPlayerX +" y=" +gPlayerY + "m=" +gMap[my * MAP_WIDTH + mx],25, 115);
 }
 
 function DrawTile(g, x, y, idx)
@@ -148,7 +155,13 @@ window.onkeydown = function(ev)
   if(c == 38) gPlayerY--;  // up
   if(c == 39) gPlayerX++;  // right
   if(c == 40) gPlayerY++;  // down
+
+  gPlayerX += (MAP_WIDTH * TILESIZE);
+  gPlayerX %= (MAP_WIDTH * TILESIZE);
+  gPlayerY += (MAP_WIDTH * TILESIZE);
+  gPlayerY %= (MAP_WIDTH * TILESIZE);
 }
+
 
 
 // evoke browser
