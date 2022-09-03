@@ -11,20 +11,24 @@ const MAP_HEIGHT = 32;
 const SCR_HEIGHT = 8;
 const SCR_WIDTH = 8;
 const SMOOTH = 0;
+const START_X =15;
+const START_Y = 17;
 const TILECOLUMN = 4;
 const TILEROW = 4;
 const TILESIZE = 8;
 const WNDSTYLE = "rgba(0,0,0, 0.75)";
-const START_X =15;
-const START_Y = 17;
+
+const gKey = new Uint8Array(0x100); //キー入力バッファ
 
 let gFrame = 0;
 let gHeight;
 let gWidth;
+let gMoveX = 0;
+let gMoveY = 0;
 let gImgMap;
 let gImgPlayer;
-let gPlayerX = START_X * TILESIZE;
-let gPlayerY = START_Y * TILESIZE;
+let gPlayerX = START_X * TILESIZE + TILESIZE / 2;
+let gPlayerY = START_Y * TILESIZE + TILESIZE /2;
 let gScreen;
 
 const gFileMap = "img/map.png"
@@ -113,7 +117,27 @@ function LoadImage()
   gImgMap = new Image(); gImgMap.src = gFileMap;
   gImgPlayer = new Image(); gImgPlayer.src = gFilePlayer;
 }
+//フィールド進行処理
+function TickField()
+{
 
+  if( gMoveX != 0 || gMoveY != 0){}
+
+  else if(gKey[37]) gMoveX =  -TILESIZE;  // left
+  else if(gKey[38]) gMoveY =  -TILESIZE;  // up
+  else if(gKey[39]) gMoveX =  TILESIZE;  // right
+  else if(gKey[40]) gMoveY = TILESIZE;  // down
+
+  gPlayerX += Math.sign(gMoveX);
+  gPlayerY += Math.sign(gMoveY);
+  gMoveX -= Math.sign(gMoveX);
+  gMoveY -= Math.sign(gMoveY);
+
+  gPlayerX += (MAP_WIDTH * TILESIZE);
+  gPlayerX %= (MAP_WIDTH * TILESIZE);
+  gPlayerY += (MAP_WIDTH * TILESIZE);
+  gPlayerY %= (MAP_WIDTH * TILESIZE);
+}
 
 function WmPaint()
 {
@@ -145,6 +169,7 @@ function WmSize()
 function WmTimer()
 {
   gFrame++;
+  TickField();
   WmPaint();
 }
 
@@ -153,17 +178,14 @@ window.onkeydown = function(ev)
 {
   let c = ev.keyCode;
 
-  if(c == 37) gPlayerX--;  // left
-  if(c == 38) gPlayerY--;  // up
-  if(c == 39) gPlayerX++;  // right
-  if(c == 40) gPlayerY++;  // down
+  gKey[c] = 1;
 
-  gPlayerX += (MAP_WIDTH * TILESIZE);
-  gPlayerX %= (MAP_WIDTH * TILESIZE);
-  gPlayerY += (MAP_WIDTH * TILESIZE);
-  gPlayerY %= (MAP_WIDTH * TILESIZE);
+
 }
-
+window.onkeyup = function( ev )
+{
+  gKey[ev.keyCode] = 0;
+}
 
 
 // evoke browser
