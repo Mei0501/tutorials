@@ -20,6 +20,7 @@ const WNDSTYLE = "rgba(0,0,0, 0.75)";
 
 const gKey = new Uint8Array(0x100); //キー入力バッファ
 
+let gAngle = 0;
 let gFrame = 0;
 let gHeight;
 let gWidth;
@@ -89,12 +90,11 @@ function DrawMain()
         gMap[ py * MAP_WIDTH + px ]);
     }
   }
-  g.fillStyle = "#ff0000";
-  g.fillRect(0,HEIGHT / 2-1, WIDTH, 2);
-  g.fillRect(WIDTH /2 -1 ,0,2, HEIGHT);
+
+
 
   g.drawImage(gImgPlayer,
-              CHRWIDTH, 0, CHRWIDTH, CHRHEIGHT,
+              (gFrame >> 3 & 1) * CHRWIDTH, gAngle * CHRHEIGHT, CHRWIDTH, CHRHEIGHT,
               WIDTH / 2 - CHRWIDTH /2, HEIGHT / 2 - CHRHEIGHT + TILESIZE /2, CHRWIDTH, CHRHEIGHT);
 
   g.fillStyle = WNDSTYLE;
@@ -123,10 +123,25 @@ function TickField()
 
   if( gMoveX != 0 || gMoveY != 0){}
 
-  else if(gKey[37]) gMoveX =  -TILESIZE;  // left
-  else if(gKey[38]) gMoveY =  -TILESIZE;  // up
-  else if(gKey[39]) gMoveX =  TILESIZE;  // right
-  else if(gKey[40]) gMoveY = TILESIZE;  // down
+  else if(gKey[37]) { gAngle = 1; gMoveX =  -TILESIZE;}  // left
+  else if(gKey[38]) { gAngle = 3; gMoveY =  -TILESIZE;}  // up
+  else if(gKey[39]) { gAngle = 2; gMoveX =  TILESIZE;}  // right
+  else if(gKey[40]) { gAngle = 0; gMoveY = TILESIZE;}  // down
+
+  //移動後のタイル画像
+  let mx = Math.floor((gPlayerX + gMoveX )/ TILESIZE);
+  let my = Math.floor((gPlayerY + gMoveY )/ TILESIZE);
+  mx += MAP_WIDTH;
+  mx %= MAP_WIDTH;
+  my += MAP_HEIGHT;
+  my %= MAP_HEIGHT;
+  let  m = gMap[ my * MAP_WIDTH + mx];
+  if( m < 3){
+    gMoveX = 0;
+    gMoveY = 0;
+  }
+ 
+
 
   gPlayerX += Math.sign(gMoveX);
   gPlayerY += Math.sign(gMoveY);
