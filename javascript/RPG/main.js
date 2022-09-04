@@ -6,10 +6,12 @@ const FONT = "12px monospace";
 const FONTSTYLE = "#ffffff";
 const HEIGHT = 120;
 const WIDTH = 128;
+const INTERVAL = 33;
 const MAP_WIDTH = 32;
 const MAP_HEIGHT = 32;
 const SCR_HEIGHT = 8;
 const SCR_WIDTH = 8;
+const SCROLL = 4;
 const SMOOTH = 0;
 const START_X =15;
 const START_Y = 17;
@@ -24,6 +26,7 @@ let gAngle = 0;
 let gFrame = 0;
 let gHeight;
 let gWidth;
+let  gMessage = null; 
 let gMoveX = 0;
 let gMoveY = 0;
 let gImgMap;
@@ -97,14 +100,27 @@ function DrawMain()
               (gFrame >> 3 & 1) * CHRWIDTH, gAngle * CHRHEIGHT, CHRWIDTH, CHRHEIGHT,
               WIDTH / 2 - CHRWIDTH /2, HEIGHT / 2 - CHRHEIGHT + TILESIZE /2, CHRWIDTH, CHRHEIGHT);
 
+
+  DrawMessage( g );
+
+
   g.fillStyle = WNDSTYLE;
-  g.fillRect(10, 103, 105, 15);
+  g.fillRect(20, 3, 105, 15);
 
   g.font = FONT;
   g.fillStyle = FONTSTYLE;
-  g.fillText("x=" + gPlayerX +" y=" +gPlayerY + "m=" +gMap[my * MAP_WIDTH + mx],25, 115);
+  g.fillText("x=" + gPlayerX +" y=" +gPlayerY + "m=" +gMap[my * MAP_WIDTH + mx],25, 15);
 }
+function DrawMessage( g )
+{
+  g.fillStyle = WNDSTYLE;
+  g.fillRect(4, 84, 120, 30);
 
+  g.font = FONT;
+  g.fillStyle = FONTSTYLE;
+
+  g.fillText( gMessage,6 ,96);
+}
 function DrawTile(g, x, y, idx)
 {
   const ix = ( idx % TILECOLUMN ) * TILESIZE;
@@ -141,12 +157,18 @@ function TickField()
     gMoveY = 0;
   }
  
+  if(m == 8 || m ==9){
+  gMessage = "魔王を倒して！";
+  }
+  if(m == 10 || m == 11){
+  gMessage = "西の果てにも村があります";
+  }
 
 
-  gPlayerX += Math.sign(gMoveX);
-  gPlayerY += Math.sign(gMoveY);
-  gMoveX -= Math.sign(gMoveX);
-  gMoveY -= Math.sign(gMoveY);
+  gPlayerX += Math.sign(gMoveX) * SCROLL;
+  gPlayerY += Math.sign(gMoveY) * SCROLL;
+  gMoveX -= Math.sign(gMoveX) * SCROLL;
+  gMoveY -= Math.sign(gMoveY) * SCROLL;
 
   gPlayerX += (MAP_WIDTH * TILESIZE);
   gPlayerX %= (MAP_WIDTH * TILESIZE);
@@ -215,5 +237,5 @@ window.onload = function()
 
   WmSize()
   window.addEventListener("resize", function() { WmSize() });
-  setInterval( function() { WmTimer() }, 33 );
+  setInterval( function() { WmTimer() }, INTERVAL );
 }
