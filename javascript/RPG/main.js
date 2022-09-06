@@ -170,26 +170,29 @@ function TickField()
     gMoveX = 0;
     gMoveY = 0;
   }
+  if(Math.abs(gMoveX) + Math.abs(gMoveY) == SCROLL){
  
-  if(m == 8 || m ==9){
-    SetMessage("魔王を倒して！", null);
+    if(m == 8 || m ==9){
+      SetMessage("魔王を倒して！", null);
+    }
+    if(m == 10 || m == 11){
+      SetMessage("西の果てにも","村があります");
+    }
+    if( m ==12){
+      SetMessage("カギは、","洞窟にあります");
+    }
+    if( m ==13){
+      SetMessage("カギを手に入れた",null);
+    }
+    if( m ==14){
+      gPlayerY -= TILESIZE;
+      SetMessage("カギが必要です",null);
+      SetMessage("扉が開いた",null);
+    }
+    if( m ==15){
+      SetMessage("魔王を倒し","世界に平和が訪れた");
+    }
   }
-  if(m == 10 || m == 11){
-    SetMessage("西の果てにも","村があります");
-  }
-  if( m ==12){
-    SetMessage("カギは、","洞窟にあります");
-  }
-  if( m ==13){
-    SetMessage("カギを手に入れた",null);
-  }
-  if( m ==14){
-    SetMessage("扉が開いた",null);
-  }
-  if( m ==15){
-    SetMessage("魔王を倒し","世界に平和が訪れた");
-  }
-
 
   gPlayerX += Math.sign(gMoveX) * SCROLL;
   gPlayerY += Math.sign(gMoveY) * SCROLL;
