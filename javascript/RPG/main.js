@@ -26,7 +26,8 @@ let gAngle = 0;
 let gFrame = 0;
 let gHeight;
 let gWidth;
-let  gMessage = null; 
+let  gMessage1 = null; 
+let gMessage2 = null;
 let gMoveX = 0;
 let gMoveY = 0;
 let gImgMap;
@@ -113,14 +114,21 @@ function DrawMain()
 }
 function DrawMessage( g )
 {
+  if(!gMessage1){
+    return;
+  }
   g.fillStyle = WNDSTYLE;
   g.fillRect(4, 84, 120, 30);
 
   g.font = FONT;
   g.fillStyle = FONTSTYLE;
 
-  g.fillText( gMessage,6 ,96);
+  g.fillText( gMessage1,6 ,96);
+  if(gMessage2){
+  g.fillText(gMessage2, 6, 110);
+  }
 }
+
 function DrawTile(g, x, y, idx)
 {
   const ix = ( idx % TILECOLUMN ) * TILESIZE;
@@ -132,6 +140,12 @@ function LoadImage()
 {
   gImgMap = new Image(); gImgMap.src = gFileMap;
   gImgPlayer = new Image(); gImgPlayer.src = gFilePlayer;
+}
+
+function SetMessage( v1 , v2)
+{
+  gMessage1 = v1;
+  gMessage2 = v2;
 }
 //フィールド進行処理
 function TickField()
@@ -156,14 +170,29 @@ function TickField()
     gMoveX = 0;
     gMoveY = 0;
   }
+  if(Math.abs(gMoveX) + Math.abs(gMoveY) == SCROLL){
  
-  if(m == 8 || m ==9){
-  gMessage = "魔王を倒して！";
+    if(m == 8 || m ==9){
+      SetMessage("魔王を倒して！", null);
+    }
+    if(m == 10 || m == 11){
+      SetMessage("西の果てにも","村があります");
+    }
+    if( m ==12){
+      SetMessage("カギは、","洞窟にあります");
+    }
+    if( m ==13){
+      SetMessage("カギを手に入れた",null);
+    }
+    if( m ==14){
+      gPlayerY -= TILESIZE;
+      SetMessage("カギが必要です",null);
+      SetMessage("扉が開いた",null);
+    }
+    if( m ==15){
+      SetMessage("魔王を倒し","世界に平和が訪れた");
+    }
   }
-  if(m == 10 || m == 11){
-  gMessage = "西の果てにも村があります";
-  }
-
 
   gPlayerX += Math.sign(gMoveX) * SCROLL;
   gPlayerY += Math.sign(gMoveY) * SCROLL;
@@ -216,6 +245,8 @@ window.onkeydown = function(ev)
   let c = ev.keyCode;
 
   gKey[c] = 1;
+
+  gMessage1 = null;
 
 
 }
