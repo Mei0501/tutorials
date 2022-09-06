@@ -13,6 +13,7 @@ const SCR_HEIGHT = 8;
 const SCR_WIDTH = 8;
 const SCROLL = 4;
 const SMOOTH = 0;
+const START_HP = 20;
 const START_X =15;
 const START_Y = 17;
 const TILECOLUMN = 4;
@@ -23,6 +24,10 @@ const WNDSTYLE = "rgba(0,0,0, 0.75)";
 const gKey = new Uint8Array(0x100); //キー入力バッファ
 
 let gAngle = 0;
+let gEx = 0;
+let gHP = START_HP;
+let gMHP = START_HP;
+let gLv = 1;
 let gFrame = 0;
 let gHeight;
 let gWidth;
@@ -32,6 +37,7 @@ let gMoveX = 0;
 let gMoveY = 0;
 let gImgMap;
 let gImgPlayer;
+let gItem = 0;
 let gPlayerX = START_X * TILESIZE + TILESIZE / 2;
 let gPlayerY = START_Y * TILESIZE + TILESIZE /2;
 let gScreen;
@@ -102,25 +108,32 @@ function DrawMain()
               WIDTH / 2 - CHRWIDTH /2, HEIGHT / 2 - CHRHEIGHT + TILESIZE /2, CHRWIDTH, CHRHEIGHT);
 
 
+  g.fillStyle = WNDSTYLE;
+  g.fillRect(2, 2, 44, 37);
+
+  DrawStatus( g );
   DrawMessage( g );
 
-
+/*
   g.fillStyle = WNDSTYLE;
   g.fillRect(20, 3, 105, 15);
 
   g.font = FONT;
   g.fillStyle = FONTSTYLE;
   g.fillText("x=" + gPlayerX +" y=" +gPlayerY + "m=" +gMap[my * MAP_WIDTH + mx],25, 15);
+*/
+
 }
 function DrawMessage( g )
 {
   if(!gMessage1){
     return;
   }
+
   g.fillStyle = WNDSTYLE;
   g.fillRect(4, 84, 120, 30);
-
   g.font = FONT;
+
   g.fillStyle = FONTSTYLE;
 
   g.fillText( gMessage1,6 ,96);
@@ -128,6 +141,20 @@ function DrawMessage( g )
   g.fillText(gMessage2, 6, 110);
   }
 }
+
+//ステータス描画
+function DrawStatus( g )
+{
+  g.font = FONT;
+  g.fillStyle = FONTSTYLE;
+  g.fillText( "Lv" + gLv, 4, 13);
+  g.fillText( "HP" + gHP, 4, 25);
+  g.fillText( "Ex" + gEx, 4, 37);
+
+
+
+}
+
 
 function DrawTile(g, x, y, idx)
 {
@@ -151,7 +178,7 @@ function SetMessage( v1 , v2)
 function TickField()
 {
 
-  if( gMoveX != 0 || gMoveY != 0){}
+  if( gMoveX != 0 || gMoveY != 0 || gMessage1){}
 
   else if(gKey[37]) { gAngle = 1; gMoveX =  -TILESIZE;}  // left
   else if(gKey[38]) { gAngle = 3; gMoveY =  -TILESIZE;}  // up
@@ -182,15 +209,22 @@ function TickField()
       SetMessage("カギは、","洞窟にあります");
     }
     if( m ==13){
+      gItem = 1;
       SetMessage("カギを手に入れた",null);
     }
     if( m ==14){
+      if(gItem == 0){
       gPlayerY -= TILESIZE;
       SetMessage("カギが必要です",null);
-      SetMessage("扉が開いた",null);
+      }else{
+        SetMessage("扉が開いた",null);
+      }
     }
     if( m ==15){
       SetMessage("魔王を倒し","世界に平和が訪れた");
+    }
+    if(Math.random() * 4 < 1){
+      SetMessage("敵が現れた！",null);
     }
   }
 
@@ -243,6 +277,10 @@ function WmTimer()
 window.onkeydown = function(ev)
 {
   let c = ev.keyCode;
+
+  if( gKey[c]!= 0){
+    return;
+  }
 
   gKey[c] = 1;
 
