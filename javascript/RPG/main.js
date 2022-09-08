@@ -36,14 +36,19 @@ let gMessage2 = null;
 let gMoveX = 0;
 let gMoveY = 0;
 let gImgMap;
+let gImgMonster;
 let gImgPlayer;
 let gItem = 0;
+let gPhase = 0;
 let gPlayerX = START_X * TILESIZE + TILESIZE / 2;
 let gPlayerY = START_Y * TILESIZE + TILESIZE /2;
 let gScreen;
 
 const gFileMap = "img/map.png"
 const gFilePlayer = "img/player.png"
+const gFileMonster = "img/monster.png"
+
+const gEncounter = [0,0,0,1,0,0,2,3,0,0,0,0,0,0,0,0];
 
 const gMap = [
  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -79,11 +84,18 @@ const gMap = [
  7,15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 0, 0, 0, 0, 0,
  7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 7, 7,
 ];
-
-
-function DrawMain()
+//戦闘画面処理
+function DrawFight( g )
 {
-  const g = gScreen.getContext("2d")
+  g.fillStyle = "#000000";
+  g.fillRect(0, 0, WIDTH, HEIGHT);
+
+  g.drawImage( gImgMonster, WIDTH /2, HEIGHT / 2);
+  
+}
+
+function DrawMap( g )
+{
 
   let mx = Math.floor(gPlayerX / TILESIZE);
   let my = Math.floor(gPlayerY / TILESIZE);
@@ -106,6 +118,20 @@ function DrawMain()
   g.drawImage(gImgPlayer,
               (gFrame >> 3 & 1) * CHRWIDTH, gAngle * CHRHEIGHT, CHRWIDTH, CHRHEIGHT,
               WIDTH / 2 - CHRWIDTH /2, HEIGHT / 2 - CHRHEIGHT + TILESIZE /2, CHRWIDTH, CHRHEIGHT);
+
+}
+
+function DrawMain()
+{
+  const g = gScreen.getContext("2d")
+
+  if ( gPhase == 0){
+  DrawMap( g );
+  }else{
+    DrawFight( g );
+  }
+
+
 
 
   g.fillStyle = WNDSTYLE;
@@ -166,6 +192,7 @@ function DrawTile(g, x, y, idx)
 function LoadImage()
 {
   gImgMap = new Image(); gImgMap.src = gFileMap;
+  gImgMonster = new Image(); gImgMonster.src = gFileMonster;
   gImgPlayer = new Image(); gImgPlayer.src = gFilePlayer;
 }
 
@@ -223,7 +250,9 @@ function TickField()
     if( m ==15){
       SetMessage("魔王を倒し","世界に平和が訪れた");
     }
-    if(Math.random() * 4 < 1){
+    if(Math.random() * 4 < gEncounter[ m ]){
+      gPhase = 1;
+      
       SetMessage("敵が現れた！",null);
     }
   }
@@ -283,6 +312,10 @@ window.onkeydown = function(ev)
   }
 
   gKey[c] = 1;
+
+  if( gPhase == 1){
+    gPhase = 0;
+  }
 
   gMessage1 = null;
 
