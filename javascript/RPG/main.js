@@ -28,6 +28,8 @@ let gEx = 0;
 let gHP = START_HP;
 let gMHP = START_HP;
 let gLv = 1;
+let gCursor = 0;
+let gEnemyType;
 let gFrame = 0;
 let gHeight;
 let gWidth;
@@ -90,11 +92,23 @@ function DrawFight( g )
   g.fillStyle = "#000000";
   g.fillRect(0, 0, WIDTH, HEIGHT);
 
-  g.drawImage( gImgMonster, WIDTH /2, HEIGHT / 2);
+  let  w = gImgMonster.width / 4;
+  let  h = gImgPlayer.height;
+
+  g.drawImage( gImgMonster, gEnemyType * w, 0, w, h, Math.floor(WIDTH /2 - w / 2),
+    Math.floor(HEIGHT / 2 - h / 2), w, h);
   
+  
+
+  DrawStatus( g );
+  DrawMessage( g );
+
+  if( gPhase == 2){
+   g.fillText("→", 6, 96 +14 * gCursor);
+  }
 }
 
-function DrawMap( g )
+function DrawField( g )
 {
 
   let mx = Math.floor(gPlayerX / TILESIZE);
@@ -119,6 +133,12 @@ function DrawMap( g )
               (gFrame >> 3 & 1) * CHRWIDTH, gAngle * CHRHEIGHT, CHRWIDTH, CHRHEIGHT,
               WIDTH / 2 - CHRWIDTH /2, HEIGHT / 2 - CHRHEIGHT + TILESIZE /2, CHRWIDTH, CHRHEIGHT);
 
+  g.fillStyle = WNDSTYLE;
+  g.fillRect(2, 2, 44, 37);
+
+  DrawStatus( g );
+  DrawMessage( g );
+
 }
 
 function DrawMain()
@@ -126,19 +146,13 @@ function DrawMain()
   const g = gScreen.getContext("2d")
 
   if ( gPhase == 0){
-  DrawMap( g );
+  DrawField( g );
   }else{
     DrawFight( g );
   }
 
 
 
-
-  g.fillStyle = WNDSTYLE;
-  g.fillRect(2, 2, 44, 37);
-
-  DrawStatus( g );
-  DrawMessage( g );
 
 /*
   g.fillStyle = WNDSTYLE;
@@ -252,6 +266,7 @@ function TickField()
     }
     if(Math.random() * 4 < gEncounter[ m ]){
       gPhase = 1;
+      gEnemyType = 0;
       
       SetMessage("敵が現れた！",null);
     }
@@ -314,7 +329,27 @@ window.onkeydown = function(ev)
   gKey[c] = 1;
 
   if( gPhase == 1){
+    gPhase = 2; //戦闘コマンド選択フェーズ
+    SetMessage("　 　戦う","　 　逃げる");
+    return;
+  }
+  if( gPhase == 2){               //戦闘コマンド選択中の場合
+    if( c == 13 || c == 90){
+      SetMessage("敵をやっつけた!", null);
+      gPhase = 3;
+      gPhase = 0;
+      gHP -= 5;
+      gEx++;
+  }else{
+    gCursor = 1 - gCursor;
+    }
+    return;
+  }
+
+  if( gPhase == 3){
     gPhase = 0;
+    gHP -= 5;
+    gEx++;
   }
 
   gMessage1 = null;
