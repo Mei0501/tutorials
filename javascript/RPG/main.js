@@ -41,7 +41,7 @@ let gImgBoss;
 let gImgMap;
 let gImgMonster;
 let gImgPlayer;
-let gItem = 0;
+let gItem = 1;
 let gPhase = 0;
 let gPlayerX = START_X * TILESIZE + TILESIZE / 2;
 let gPlayerY = START_Y * TILESIZE + TILESIZE /2;
@@ -54,7 +54,7 @@ const gFileMonster = "img/monster.png"
 
 const gEncounter = [0,0,0,1,0,0,2,3,0,0,0,0,0,0,0,0];
 
-const gMOnsterName = ["スライム","うさぎ","ナイト","ドラゴン","魔王"];
+const gMonsterName = ["スライム","うさぎ","ナイト","ドラゴン","魔王"];
 
 const gMap = [
  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -96,13 +96,19 @@ function Action()
   gPhase++;
 
   if( gPhase ==3){
-    SetMessage(gMOnsterName[ gEnemyType ]+"の攻撃", 999 + "のダメージ");
+    const d = GetDamage( gEnemyType + 2);
+    SetMessage(gMonsterName[ gEnemyType ]+"の攻撃", d + "のダメージ");
+    gHP -= d;
+    if(gHP <= 0 ){
+      gPhase = 7;
+    }
 
     return;
   }
   if( gCursor == 0){
-      SetMessage("あなたの攻撃", 333 + "のダメージ！");
-    gPhase = 5;
+    const d = GetDamage( gLv + 1);
+      SetMessage("あなたの攻撃", d + "のダメージ！");
+   // gPhase = 5;
     return;
   }
 
@@ -262,9 +268,14 @@ function DrawTile(g, x, y, idx)
   g.drawImage( gImgMap, ix, iy, TILESIZE, TILESIZE, x, y, TILESIZE, TILESIZE )
 }
 
+function GetDamage( a )
+{
+  return( Math.floor( a * (1 + Math.random())));
+}
+
 function IsBoss()
 {
-  return( gEnemyType == gMOnsterName.length -1 );
+  return( gEnemyType == gMonsterName.length -1 );
 }
 
 function LoadImage()
@@ -329,12 +340,22 @@ function TickField()
       }
     }
     if( m ==15){
-      AppearEnemy(gMOnsterName.length -1);
+      AppearEnemy(gMonsterName.length -1);
 
     }
-    if(Math.random() * 4 < gEncounter[ m ]){
-      gPhase = 1;
-      AppearEnemy( 0 );
+    if(Math.random() * 8 < gEncounter[ m ]){
+      let  t = Math.abs( gPlayerX / TILESIZE -START_X) +
+              Math.abs(gPlayerY /TILESIZE - START_Y);
+      if( m == 6){
+        t += 8;
+      }
+      if( m == 7){
+        t += 16;
+      }
+      t += Math.random() * 8;
+      t = Math.floor( t / 16 );
+      t = Math.min( t, gMonsterName.length -2);
+      AppearEnemy( t );
     }
   }
 
