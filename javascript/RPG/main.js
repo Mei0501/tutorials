@@ -37,6 +37,7 @@ let  gMessage1 = null;
 let gMessage2 = null;
 let gMoveX = 0;
 let gMoveY = 0;
+let gImgBoss;
 let gImgMap;
 let gImgMonster;
 let gImgPlayer;
@@ -46,6 +47,7 @@ let gPlayerX = START_X * TILESIZE + TILESIZE / 2;
 let gPlayerY = START_Y * TILESIZE + TILESIZE /2;
 let gScreen;
 
+const gFileBoss = "img/boss.png"
 const gFileMap = "img/map.png"
 const gFilePlayer = "img/player.png"
 const gFileMonster = "img/monster.png"
@@ -95,7 +97,6 @@ function Action()
 
   if( gPhase ==3){
     SetMessage(gMOnsterName[ gEnemyType ]+"の攻撃", 999 + "のダメージ");
-gPhase = 7;
 
     return;
   }
@@ -124,6 +125,12 @@ function AddExp( val)
     gMHP += 4 + Math.floor( Math.random() * 3);
   }
 }
+function AppearEnemy( t )
+{
+  gPhase = 1;
+  gEnemyType = t;
+  SetMessage("敵が現れた！",null);
+  }
 
 function CommandFight()
 {
@@ -137,11 +144,18 @@ function DrawFight( g )
   g.fillStyle = "#000000";
   g.fillRect(0, 0, WIDTH, HEIGHT);
 
+  if( gPhase <= 5){
+
+  
+  if( IsBoss()){
+  g.drawImage( gImgBoss, WIDTH / 2 -gImgBoss.width /2, HEIGHT /2 - gImgBoss.height / 2);
+  }else{
   let  w = gImgMonster.width / 4;
   let  h = gImgPlayer.height;
-
   g.drawImage( gImgMonster, gEnemyType * w, 0, w, h, Math.floor(WIDTH /2 - w / 2),
     Math.floor(HEIGHT / 2 - h / 2), w, h);
+  }
+  }
   
   
 
@@ -248,8 +262,14 @@ function DrawTile(g, x, y, idx)
   g.drawImage( gImgMap, ix, iy, TILESIZE, TILESIZE, x, y, TILESIZE, TILESIZE )
 }
 
+function IsBoss()
+{
+  return( gEnemyType == gMOnsterName.length -1 );
+}
+
 function LoadImage()
 {
+  gImgBoss = new Image(); gImgBoss.src = gFileBoss;
   gImgMap = new Image(); gImgMap.src = gFileMap;
   gImgMonster = new Image(); gImgMonster.src = gFileMonster;
   gImgPlayer = new Image(); gImgPlayer.src = gFilePlayer;
@@ -309,13 +329,12 @@ function TickField()
       }
     }
     if( m ==15){
-      SetMessage("魔王を倒し","世界に平和が訪れた");
+      AppearEnemy(gMOnsterName.length -1);
+
     }
     if(Math.random() * 4 < gEncounter[ m ]){
       gPhase = 1;
-      gEnemyType = 0;
-      
-      SetMessage("敵が現れた！",null);
+      AppearEnemy( 0 );
     }
   }
 
@@ -399,12 +418,17 @@ window.onkeydown = function(ev)
   }
   if( gPhase == 5){
     gPhase = 6;
-    AddExp( gEx += gEnemyType + 1);
+    AddExp( gEnemyType + 1);
     SetMessage("敵をやっつけた！");
     return;
   }
 
   if( gPhase == 6){
+    if( IsBoss() && gCursor ==0){
+      SetMessage("魔王を倒し","世界に平和が訪れた");
+      return;
+    }
+
     gPhase = 0;
   }
 
