@@ -86,6 +86,32 @@ const gMap = [
  7,15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 0, 0, 0, 0, 0,
  7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 7, 7,
 ];
+
+function Action()
+{
+  gPhase++;
+
+  if( gPhase ==3){
+    SetMessage("敵の攻撃", 999 + "のダメージ");
+    return;
+  }
+  if( gCursor == 0){
+      SetMessage("あなたの攻撃", 333 + "のダメージ！");
+    return;
+  }
+  SetMessage("あなたは抜け出した",null);
+
+
+}
+
+function AddExp( val)
+{
+  gEx += val;
+  while( gLv  * (gLv + 1) * 2<= gEx){
+    gLv++;
+    gMHP += 4 + Math.floor( Math.random() * 3);
+  }
+}
 //戦闘画面処理
 function DrawFight( g )
 {
@@ -241,9 +267,11 @@ function TickField()
   if(Math.abs(gMoveX) + Math.abs(gMoveY) == SCROLL){
  
     if(m == 8 || m ==9){
+      gHP = gMHP;
       SetMessage("魔王を倒して！", null);
     }
     if(m == 10 || m == 11){
+      gHP = gMHP;
       SetMessage("西の果てにも","村があります");
     }
     if( m ==12){
@@ -335,21 +363,24 @@ window.onkeydown = function(ev)
   }
   if( gPhase == 2){               //戦闘コマンド選択中の場合
     if( c == 13 || c == 90){
-      SetMessage("敵をやっつけた!", null);
-      gPhase = 3;
-      gPhase = 0;
-      gHP -= 5;
-      gEx++;
+      Action();
   }else{
     gCursor = 1 - gCursor;
     }
     return;
   }
 
-  if( gPhase == 3){
+  if ( gPhase == 3){
+    Action();
+    return;
+  }
+
+  if( gPhase == 4){
     gPhase = 0;
     gHP -= 5;
-    gEx++;
+    AddExp( gEx += gEnemyType + 1);
+
+
   }
 
   gMessage1 = null;
