@@ -52,6 +52,8 @@ const gFileMonster = "img/monster.png"
 
 const gEncounter = [0,0,0,1,0,0,2,3,0,0,0,0,0,0,0,0];
 
+const gMOnsterName = ["スライム","うさぎ","ナイト","ドラゴン","魔王"];
+
 const gMap = [
  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
  0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -92,14 +94,24 @@ function Action()
   gPhase++;
 
   if( gPhase ==3){
-    SetMessage("敵の攻撃", 999 + "のダメージ");
+    SetMessage(gMOnsterName[ gEnemyType ]+"の攻撃", 999 + "のダメージ");
+gPhase = 7;
+
     return;
   }
   if( gCursor == 0){
       SetMessage("あなたの攻撃", 333 + "のダメージ！");
+    gPhase = 5;
     return;
   }
-  SetMessage("あなたは抜け出した",null);
+
+  if(Math.random() < 0.5){
+    SetMessage("あなたは逃げ出した",null);
+    gPhase = 6;
+    return;
+
+  }
+  SetMessage("あなたは逃げ出した","しかし回り込まれた");
 
 
 }
@@ -111,6 +123,13 @@ function AddExp( val)
     gLv++;
     gMHP += 4 + Math.floor( Math.random() * 3);
   }
+}
+
+function CommandFight()
+{
+  gPhase = 2; //戦闘コマンド選択フェーズ
+  gCursor = 0;
+  SetMessage("　 　戦う","　 　逃げる");
 }
 //戦闘画面処理
 function DrawFight( g )
@@ -171,7 +190,7 @@ function DrawMain()
 {
   const g = gScreen.getContext("2d")
 
-  if ( gPhase == 0){
+  if ( gPhase <= 1){
   DrawField( g );
   }else{
     DrawFight( g );
@@ -357,8 +376,7 @@ window.onkeydown = function(ev)
   gKey[c] = 1;
 
   if( gPhase == 1){
-    gPhase = 2; //戦闘コマンド選択フェーズ
-    SetMessage("　 　戦う","　 　逃げる");
+    CommandFight();
     return;
   }
   if( gPhase == 2){               //戦闘コマンド選択中の場合
@@ -376,12 +394,31 @@ window.onkeydown = function(ev)
   }
 
   if( gPhase == 4){
-    gPhase = 0;
-    gHP -= 5;
-    AddExp( gEx += gEnemyType + 1);
-
-
+    CommandFight();
+    return;
   }
+  if( gPhase == 5){
+    gPhase = 6;
+    AddExp( gEx += gEnemyType + 1);
+    SetMessage("敵をやっつけた！");
+    return;
+  }
+
+  if( gPhase == 6){
+    gPhase = 0;
+  }
+
+  if( gPhase == 7){
+    gPhase = 8;
+    SetMessage("あなたは死亡した",null);
+    return;
+  }
+
+  if( gPhase == 8){
+    SetMessage("Game over");
+  }
+
+
 
   gMessage1 = null;
 
