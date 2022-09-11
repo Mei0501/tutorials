@@ -11,9 +11,9 @@ const MAP_WIDTH = 32;
 const MAP_HEIGHT = 32;
 const SCR_HEIGHT = 8;
 const SCR_WIDTH = 8;
-const SCROLL = 4;
+const SCROLL = 1;
 const SMOOTH = 0;
-const START_HP = 20;
+const START_HP = 50;
 const START_X =15;
 const START_Y = 17;
 const TILECOLUMN = 4;
@@ -29,6 +29,7 @@ let gHP = START_HP;
 let gMHP = START_HP;
 let gLv = 1;
 let gCursor = 0;
+let gEnemyHP;
 let gEnemyType;
 let gFrame = 0;
 let gHeight;
@@ -41,8 +42,9 @@ let gImgBoss;
 let gImgMap;
 let gImgMonster;
 let gImgPlayer;
-let gItem = 1;
+let gItem = 0;
 let gPhase = 0;
+let gOrder;
 let gPlayerX = START_X * TILESIZE + TILESIZE / 2;
 let gPlayerY = START_Y * TILESIZE + TILESIZE /2;
 let gScreen;
@@ -95,7 +97,7 @@ function Action()
 {
   gPhase++;
 
-  if( gPhase ==3){
+  if( (( gPhase + gOrder) & 1)  == 0){
     const d = GetDamage( gEnemyType + 2);
     SetMessage(gMonsterName[ gEnemyType ]+"の攻撃", d + "のダメージ");
     gHP -= d;
@@ -108,7 +110,10 @@ function Action()
   if( gCursor == 0){
     const d = GetDamage( gLv + 1);
       SetMessage("あなたの攻撃", d + "のダメージ！");
-   // gPhase = 5;
+    gEnemyHP -= d;
+    if( gEnemyHP <= 0){
+        gPhase = 5;
+    }
     return;
   }
 
@@ -134,6 +139,7 @@ function AddExp( val)
 function AppearEnemy( t )
 {
   gPhase = 1;
+  gEnemyHP = t* 3 + 5;
   gEnemyType = t;
   SetMessage("敵が現れた！",null);
   }
@@ -252,14 +258,18 @@ function DrawStatus( g )
 {
   g.font = FONT;
   g.fillStyle = FONTSTYLE;
-  g.fillText( "Lv" + gLv, 4, 13);
-  g.fillText( "HP" + gHP, 4, 25);
-  g.fillText( "Ex" + gEx, 4, 37);
-
-
-
+  g.fillText( "Lv" , 4, 13); DrawTextR(g, gLv, 40, 13);
+  g.fillText( "HP" , 4, 25); DrawTextR(g, gHP, 40, 25);
+  g.fillText( "Ex" , 4, 37); DrawTextR(g, gEx, 40, 37);
 }
 
+function DrawTextR( g, str, x, y)
+{
+  g.textAlign = "right";
+  g.fillText( str, x, y);
+  g.textAlign = "left";
+
+}
 
 function DrawTile(g, x, y, idx)
 {
@@ -294,6 +304,10 @@ function SetMessage( v1 , v2)
 //フィールド進行処理
 function TickField()
 {
+  if ( gPhase != 0){
+    return;
+  }
+
 
   if( gMoveX != 0 || gMoveY != 0 || gMessage1){}
 
@@ -399,8 +413,10 @@ function WmSize()
 
 function WmTimer()
 {
-  gFrame++;
-  TickField();
+  if( !gMessage1){
+    gFrame++;
+    TickField();
+  }
   WmPaint();
 }
 
@@ -421,6 +437,7 @@ window.onkeydown = function(ev)
   }
   if( gPhase == 2){               //戦闘コマンド選択中の場合
     if( c == 13 || c == 90){
+      gOrder = Math.floor( Math.random() * 2);
       Action();
   }else{
     gCursor = 1 - gCursor;
