@@ -373,10 +373,10 @@ function TickField()
     }
   }
 
-  gPlayerX += Math.sign(gMoveX) * SCROLL;
-  gPlayerY += Math.sign(gMoveY) * SCROLL;
-  gMoveX -= Math.sign(gMoveX) * SCROLL;
-  gMoveY -= Math.sign(gMoveY) * SCROLL;
+  gPlayerX += TUG.Sign(gMoveX) * SCROLL;
+  gPlayerY += TUG.Sign(gMoveY) * SCROLL;
+  gMoveX -= TUG.Sign(gMoveX) * SCROLL;
+  gMoveY -= TUG.Sign(gMoveY) * SCROLL;
 
   gPlayerX += (MAP_WIDTH * TILESIZE);
   gPlayerX %= (MAP_WIDTH * TILESIZE);
@@ -411,7 +411,7 @@ function WmSize()
   }
 }
 
-function WmTimer()
+TUG.onTimer = function()
 {
   if( !gMessage1){
     gFrame++;
@@ -504,5 +504,5 @@ window.onload = function()
 
   WmSize()
   window.addEventListener("resize", function() { WmSize() });
-  setInterval( function() { WmTimer() }, INTERVAL );
+  TUG.init();
 }
