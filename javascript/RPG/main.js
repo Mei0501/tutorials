@@ -47,7 +47,6 @@ let gPhase = 0;
 let gOrder;
 let gPlayerX = START_X * TILESIZE + TILESIZE / 2;
 let gPlayerY = START_Y * TILESIZE + TILESIZE /2;
-let gScreen;
 
 const gFileBoss = "img/boss.png"
 const gFileMap = "img/map.png"
@@ -214,7 +213,7 @@ function DrawField( g )
 
 function DrawMain()
 {
-  const g = gScreen.getContext("2d")
+  const g = TUG.GR.mG;
 
   if ( gPhase <= 1){
   DrawField( g );
@@ -390,7 +389,7 @@ function WmPaint()
 
   const ca = document.getElementById("main"); // get element of main canvas
   const g = ca.getContext("2d");  // get 2D context
-  g.drawImage(gScreen, 0, 0, gScreen.width, gScreen.height, 0, 0, gWidth, gHeight);
+  g.drawImage(TUG.GR.mCanvas, 0, 0, TUG.GR.mCanvas.width, TUG.GR.mCanvas.height, 0, 0, gWidth, gHeight);
 }
 
 function WmSize()
@@ -411,11 +410,14 @@ function WmSize()
   }
 }
 
-TUG.onTimer = function()
+TUG.onTimer = function( d )
 {
   if( !gMessage1){
+    while( d--){
+
     gFrame++;
     TickField();
+    }
   }
   WmPaint();
 }
@@ -498,9 +500,6 @@ window.onload = function()
   LoadImage();
   gImgMap = new Image(); gImgMap.src = "img/map.png";
 
-  gScreen = document.createElement("canvas");
-  gScreen.width = WIDTH;
-  gScreen.height = HEIGHT;
 
   WmSize()
   window.addEventListener("resize", function() { WmSize() });
